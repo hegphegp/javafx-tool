@@ -37,7 +37,6 @@ public class TreeViewSample extends Application {
         StackPane root = new StackPane();
         root.getChildren().add(new TreeView(rootItem));
         primaryStage.setScene(new Scene(root, 300, 250));
-
         primaryStage.show();
     }
 }
