@@ -2,6 +2,7 @@ package com.hegp;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class TabPaneApp extends Application {
@@ -20,16 +22,12 @@ public class TabPaneApp extends Application {
     public Parent createContent() {
         //Each tab illustrates different capabilities
         tabPane = new TabPane();
-        tabPane.setPrefSize(800, 720);
-        tabPane.setMinSize(TabPane.USE_PREF_SIZE, TabPane.USE_PREF_SIZE);
-        tabPane.setMaxSize(TabPane.USE_PREF_SIZE, TabPane.USE_PREF_SIZE);
+        setTabPaneCenter();
+        tabPane.setSide(Side.TOP);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
         Tab tab1 = new Tab();
-        Tab tab2 = new Tab();
         internalTab = new Tab();
 
-//        tabPane.setRotateGraphic(false);
-//        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
-//        tabPane.setSide(Side.TOP);
         final VBox vbox = getVBox();
         // Initial tab with buttons for experimenting
         tab1.setText("Tab 1");
@@ -39,34 +37,23 @@ public class TabPaneApp extends Application {
         setUpControlButtons(vbox);
         tab1.setContent(vbox);
         tabPane.getTabs().add(tab1);
-        // Tab2 has longer label and toggles tab closing
-        tab2.setText("Longer Tab");
-        final VBox vboxLongTab = getVBox();
-
-        Label explainRadios = new Label("Closing policy for tabs:");
-        vboxLongTab.getChildren().add(explainRadios);
-        ToggleGroup closingPolicy = new ToggleGroup();
-
-        for (TabPane.TabClosingPolicy policy : TabPane.TabClosingPolicy.values()) {
-            final RadioButton radioButton = new RadioButton(policy.name());
-            radioButton.setMnemonicParsing(false);
-            radioButton.setToggleGroup(closingPolicy);
-            radioButton.setOnAction((ActionEvent event) -> {
-                tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.valueOf(radioButton.getText()));
-            });
-            if (policy.name().equals(TabPane.TabClosingPolicy.SELECTED_TAB.name())) {
-                radioButton.setSelected(true);
-            }
-            vboxLongTab.getChildren().add(radioButton);
-        }
-        tab2.setContent(vboxLongTab);
-        tabPane.getTabs().add(tab2);
 
         // Internal Tabs
         internalTab.setText("Internal Tabs");
         setupInternalTab();
         tabPane.getTabs().add(internalTab);
         return tabPane;
+    }
+
+    private void setTabPaneCenter() {
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        double screenWidth  = primaryScreenBounds.getWidth();
+        double screenHeight = primaryScreenBounds.getHeight();
+        double widthRatio = 0.5;  // 占屏幕总宽度的比例
+        double heightRatio = 0.6; // 占屏幕总高度的比例
+        tabPane.setPrefSize(screenWidth * widthRatio, screenHeight * heightRatio);
+        tabPane.setMinSize(TabPane.USE_PREF_SIZE, TabPane.USE_PREF_SIZE);
+        tabPane.setMaxSize(TabPane.USE_PREF_SIZE, TabPane.USE_PREF_SIZE);
     }
 
     private VBox getVBox() {
@@ -93,7 +80,6 @@ public class TabPaneApp extends Application {
     private void setupInternalTab() {
         StackPane internalTabContent = new StackPane();
         final TabPane internalTabPane = new TabPane();
-        internalTabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
         internalTabPane.setSide(Side.LEFT);
 
         internalTabPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
