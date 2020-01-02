@@ -1,8 +1,11 @@
 package com.hegp.combine;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -12,15 +15,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class Combine extends Application {
     private MenuBar menuBar = null;
     private TabPane mainTabPane = null;
     private BorderPane mainBorderPane = null;
     private StackPane leftMenuTreePane = null;
-
+    private Stage primaryStage = null;
     @Override
     public void start(Stage primaryStage) {
         initBorderPane();
@@ -30,7 +38,9 @@ public class Combine extends Application {
         double widthRatio = 0.5;  // 占屏幕总宽度的比例
         double heightRatio = 0.6; // 占屏幕总高度的比例
         Scene scene = new Scene(mainBorderPane, screenWidth * widthRatio, screenHeight * heightRatio);
+        scene.getStylesheets().add(getClass().getResource("/application.css").toExternalForm());
         primaryStage.setScene(scene);
+        this.primaryStage=primaryStage;
         primaryStage.show();
     }
 
@@ -38,22 +48,23 @@ public class Combine extends Application {
         mainTabPane = new TabPane();
         mainTabPane.setSide(Side.TOP);
         mainTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-        Tab tab1 = new Tab();
-        Tab internalTab = new Tab();
-
-        final VBox vbox = getVBox();
-        // Initial tab with buttons for experimenting
-        tab1.setText("Tab 1");
-        tab1.setTooltip(new Tooltip("Tab 1 Tooltip"));
-        tab1.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/setting.png"))));
-
-        tab1.setContent(vbox);
-        mainTabPane.getTabs().add(tab1);
 
         // Internal Tabs
+        Tab internalTab = new Tab();
         internalTab.setText("Internal Tabs");
         setupInternalTab(internalTab);
         mainTabPane.getTabs().add(internalTab);
+
+        // Initial tab with buttons for experimenting
+        Tab tab1 = new Tab();
+        tab1.setText("Tab");
+        tab1.setTooltip(new Tooltip("Tab Tooltip"));
+        tab1.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/setting.png"))));
+
+        final VBox vbox = getVBox();
+        tab1.setContent(vbox);
+        vbox.getChildren().add(new Label("11"));
+        mainTabPane.getTabs().add(tab1);
     }
 
     private void setupInternalTab(Tab internalTab) {
@@ -67,6 +78,22 @@ public class Combine extends Application {
         innerTab.setText("Tab 1");
         final VBox innerVbox = getVBox();
         Button innerTabPosButton = new Button("Toggle Tab Position");
+        innerTabPosButton.setText("Open Dialog");
+        innerTabPosButton.setOnAction(
+            new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    final Stage dialog = new Stage();
+                    dialog.setTitle("改变字体");
+                    dialog.initModality(Modality.WINDOW_MODAL);
+                    dialog.initOwner(((Node) event.getSource()).getScene().getWindow());
+                    VBox dialogVbox = new VBox(20);
+                    dialogVbox.getChildren().add(new Text("改变字体"));
+                    Scene dialogScene = new Scene(dialogVbox, 300, 200);
+                    dialog.setScene(dialogScene);
+                    dialog.show();
+                }
+            });
         innerVbox.getChildren().add(innerTabPosButton);
         innerTab.setContent(innerVbox);
         internalTabPane.getTabs().add(innerTab);
@@ -156,6 +183,12 @@ public class Combine extends Application {
     }
 
     public static void main(String[] args) {
+        // new Font(20).getFamilies() 获取系统所有字体
+        List<String> list = new Font(20).getFamilies();
+        for(int i=0; i<list.size(); i++) {
+            System.out.println(list.get(i));
+        }
+
         launch(args);
     }
 
